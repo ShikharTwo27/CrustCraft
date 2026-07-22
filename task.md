@@ -1,0 +1,29 @@
+# Task List - JS Migration & Scaffolding
+
+- [x] Backend JS Migration
+  - [x] Delete `server/tsconfig.json`
+  - [x] Modify `server/package.json` (remove TS/types, add nodemon)
+  - [x] Rewrite `server/jest.config.js` for plain JS
+  - [x] Rename and convert `server/src` config files (`db`, `env`, `socket`) to JS (CommonJS)
+  - [x] Rename and convert `server/src` models (`User`, `InventoryItem`, `PizzaOption`, `Order`) to JS (CommonJS)
+  - [x] Rename and convert `server/src` middlewares (`auth`, `role`, `error`, `validate`) to JS (CommonJS)
+  - [x] Rename and convert `server/src` utils (`jwt`, `errors`) to JS
+  - [x] Rename and convert `server/src` services (`auth`, `email`) and validation (`auth`) to JS
+  - [x] Rename and convert `server/src` routes and registry (`auth`, `index`) to JS
+  - [x] Rename and convert `server/src/app.ts` & `server/src/server.ts` to JS
+  - [x] Rename and convert `server/tests/auth.test.ts` to JS
+  - [x] Delete old `.ts` files from `server/`
+- [x] Frontend JS Migration
+  - [x] Delete `client/tsconfig.json` and its TS profiles
+  - [x] Modify `client/package.json` (remove TS/types)
+  - [x] Rename and rewrite `client/vite.config.ts` to `client/vite.config.js`
+  - [x] Rename and convert core client entry points (`main.tsx` ➡️ `main.jsx`, `App.tsx` ➡️ `App.jsx`)
+  - [x] Rename and convert client utils & store (`api`, `store`, `hooks`) to JS
+  - [x] Rename and convert layout & protection components (`MainLayout`, `ProtectedRoute`, `Navbar`) to JS/JSX
+  - [x] Rename and convert auth visual features (`Login`, `Register`, `VerifyEmail`, `VerifyEmailNotice`, `ForgotPassword`, `ResetPassword`) to JSX
+  - [x] Rename and convert pages placeholders (`Home`, `NotFound`, `Unauthorized`, `BuilderPlaceholder`, `OrdersPlaceholder`, `AdminInventoryPlaceholder`) to JSX
+  - [x] Delete old `.ts` and `.tsx` files from `client/`
+- [x] Dependencies Install & Testing
+  - [x] Run root and prefix installation scripts to clean up lockfiles
+  - [x] Execute JS test suite using Jest to verify auth flows
+  - [x] Run dev servers to check for errors

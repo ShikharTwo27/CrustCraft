@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-orange-50/10 text-stone-900 antialiased;
+    font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+  }
+}
+
+/* Glassmorphism styling helpers */
+.glass-panel {
+  @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-xl shadow-stone-200/50;
+}
+
+.pizza-gradient {
+  background: linear-gradient(135deg, #f47318 0%, #e0530e 100%);
+}
+
+.pizza-gradient-hover {
+  background: linear-gradient(135deg, #e0530e 0%, #ba3a0c 100%);
+}
