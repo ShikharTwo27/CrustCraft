@@ -25,3 +25,10 @@ pnpm-debug.log*
 # OS files
 .DS_Store
 Thumbs.db
+
+# MongoDB database
+db/
+*.wt
+WiredTiger*
+mongod.lock
+storage.bson
