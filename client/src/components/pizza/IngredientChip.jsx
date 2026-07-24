@@ -42,7 +42,7 @@ export const IngredientChip = ({ item, isSelected, onClick, disabled }) => {
           </div>
         </div>
         <span className="text-xs font-black text-[#e23e20] shrink-0 mt-0.5">
-          +${item.price.toFixed(2)}
+          +₹{item.price.toFixed(2)}
         </span>
       </div>
 

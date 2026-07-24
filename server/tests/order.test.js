@@ -63,10 +63,10 @@ beforeEach(async () => {
   const veggieInv = await InventoryItem.create({ name: 'Mushrooms', type: 'veggies', quantity: 2, threshold: 1 });
 
   // 3. Setup mock pizza options
-  const crustOpt = await PizzaOption.create({ name: 'Thin Crust', type: 'base', price: 2.0, inventoryItem: crustInv._id });
-  const sauceOpt = await PizzaOption.create({ name: 'Marinara', type: 'sauce', price: 0.5, inventoryItem: sauceInv._id });
-  const cheeseOpt = await PizzaOption.create({ name: 'Mozzarella', type: 'cheese', price: 1.5, inventoryItem: cheeseInv._id });
-  const veggieOpt = await PizzaOption.create({ name: 'Mushrooms', type: 'veggies', price: 0.8, inventoryItem: veggieInv._id });
+  const crustOpt = await PizzaOption.create({ name: 'Thin Crust', type: 'base', price: 160.0, inventoryItem: crustInv._id });
+  const sauceOpt = await PizzaOption.create({ name: 'Marinara', type: 'sauce', price: 40.0, inventoryItem: sauceInv._id });
+  const cheeseOpt = await PizzaOption.create({ name: 'Mozzarella', type: 'cheese', price: 120.0, inventoryItem: cheeseInv._id });
+  const veggieOpt = await PizzaOption.create({ name: 'Mushrooms', type: 'veggies', price: 64.0, inventoryItem: veggieInv._id });
 
   crustOptionId = crustOpt._id.toString();
   sauceOptionId = sauceOpt._id.toString();
@@ -97,7 +97,7 @@ describe('Checkout and Stock Validation Integration Tests', () => {
     expect(res.statusCode).toBe(201);
     expect(res.body.success).toBe(true);
     expect(res.body.data.paymentStatus).toBe('pending');
-    expect(res.body.data.totalAmount).toBe(14.60);
+    expect(res.body.data.totalAmount).toBe(1168.00);
 
     const order = await Order.findById(res.body.data._id);
     expect(order).toBeTruthy();

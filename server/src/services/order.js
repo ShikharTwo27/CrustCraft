@@ -29,10 +29,13 @@ const createOrder = async (userId, data) => {
   // 1. Gather all option IDs to fetch details in a single query
   const optionIds = new Set();
   items.forEach((item) => {
+    if (item.isSide) return;
     optionIds.add(item.base);
     optionIds.add(item.sauce);
     optionIds.add(item.cheese);
-    item.veggies.forEach((v) => optionIds.add(v));
+    if (item.veggies) {
+      item.veggies.forEach((v) => optionIds.add(v));
+    }
   });
 
   const options = await PizzaOption.find({ _id: { $in: Array.from(optionIds) } }).populate(
@@ -47,7 +50,30 @@ const createOrder = async (userId, data) => {
   const orderItems = [];
   let totalAmount = 0;
 
+  const SIDES_PRICING = {
+    garlic_bread: { name: 'Garlic Breadsticks', price: 399 },
+    lava_cake: { name: 'Choco Lava Cake', price: 319 },
+    coke: { name: 'Mexican Coca-Cola', price: 180 },
+  };
+
   for (const item of items) {
+    if (item.isSide) {
+      const sideInfo = SIDES_PRICING[item.sideId];
+      if (!sideInfo) {
+        throw new AppError('Invalid side item selected.', 400);
+      }
+      const itemPrice = parseFloat((sideInfo.price * item.quantity).toFixed(2));
+      totalAmount += itemPrice;
+
+      orderItems.push({
+        price: sideInfo.price,
+        quantity: item.quantity,
+        isSide: true,
+        sideName: sideInfo.name,
+      });
+      continue;
+    }
+
     const baseOpt = optionsMap.get(item.base);
     const sauceOpt = optionsMap.get(item.sauce);
     const cheeseOpt = optionsMap.get(item.cheese);
@@ -61,15 +87,17 @@ const createOrder = async (userId, data) => {
     }
 
     const veggieOpts = [];
-    for (const vId of item.veggies) {
-      const vOpt = optionsMap.get(vId);
-      if (!vOpt) {
-        throw new AppError('Invalid veggie option selected.', 400);
+    if (item.veggies) {
+      for (const vId of item.veggies) {
+        const vOpt = optionsMap.get(vId);
+        if (!vOpt) {
+          throw new AppError('Invalid veggie option selected.', 400);
+        }
+        if (!vOpt.isAvailable) {
+          throw new AppError(`Topping '${vOpt.name}' is currently unavailable.`, 400);
+        }
+        veggieOpts.push(vOpt);
       }
-      if (!vOpt.isAvailable) {
-        throw new AppError(`Topping '${vOpt.name}' is currently unavailable.`, 400);
-      }
-      veggieOpts.push(vOpt);
     }
 
     // Calculate individual custom pizza cost (crust + sauce + cheese + toppings surcharges)
@@ -80,9 +108,9 @@ const createOrder = async (userId, data) => {
 
     // Size pricing surcharges
     if (item.size === 'medium') {
-      pizzaPrice += 2.5;
+      pizzaPrice += 200;
     } else if (item.size === 'large') {
-      pizzaPrice += 5.0;
+      pizzaPrice += 400;
     }
 
     const itemPrice = parseFloat((pizzaPrice * item.quantity).toFixed(2));

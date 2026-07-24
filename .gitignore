@@ -26,7 +26,7 @@ pnpm-debug.log*
 .DS_Store
 Thumbs.db
 
-# MongoDB database
+# Local MongoDB Database
 db/
 *.wt
 WiredTiger*

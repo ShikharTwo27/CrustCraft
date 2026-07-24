@@ -12,7 +12,7 @@ export const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('accessToken');
+    const token = sessionStorage.getItem('accessToken');
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -56,14 +56,16 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
+        const refreshToken = sessionStorage.getItem('refreshToken');
         const response = await axios.post(
           `${API_URL}/auth/refresh-token`,
-          {},
+          { refreshToken },
           { withCredentials: true }
         );
 
-        const { accessToken } = response.data.data;
-        localStorage.setItem('accessToken', accessToken);
+        const { accessToken, refreshToken: newRefreshToken } = response.data.data;
+        sessionStorage.setItem('accessToken', accessToken);
+        sessionStorage.setItem('refreshToken', newRefreshToken);
 
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         
@@ -75,7 +77,8 @@ api.interceptors.response.use(
         processQueue(refreshError, null);
         isRefreshing = false;
         
-        localStorage.removeItem('accessToken');
+        sessionStorage.removeItem('accessToken');
+        sessionStorage.removeItem('refreshToken');
         window.dispatchEvent(new Event('auth-logout'));
         
         return Promise.reject(refreshError);

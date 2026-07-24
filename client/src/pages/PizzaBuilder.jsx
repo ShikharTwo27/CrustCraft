@@ -36,7 +36,7 @@ const PriceDisplay = ({ value }) => {
     requestAnimationFrame(anim);
   }, [value]);
 
-  return <span>${displayPrice.toFixed(2)}</span>;
+  return <span>₹{displayPrice.toFixed(2)}</span>;
 };
 
 // Pizza Loader animation with circular slice cutout
@@ -93,7 +93,7 @@ export const PizzaBuilder = () => {
   // Set default selections once options are loaded or load pre-selected combo preset
   useEffect(() => {
     if (options.length > 0) {
-      const presetData = localStorage.getItem('pizzaPreset');
+      const presetData = sessionStorage.getItem('pizzaPreset');
       if (presetData) {
         try {
           const preset = JSON.parse(presetData);
@@ -107,7 +107,7 @@ export const PizzaBuilder = () => {
           if (matchCheese) setSelectedCheese(matchCheese);
           if (matchVeggies.length > 0) setSelectedVeggies(matchVeggies);
 
-          localStorage.removeItem('pizzaPreset');
+          sessionStorage.removeItem('pizzaPreset');
           return; // Skip defaults
         } catch (err) {
           console.error('Error preloading preset:', err);
@@ -152,8 +152,8 @@ export const PizzaBuilder = () => {
       baseVal += v.price;
     });
 
-    if (size === 'medium') baseVal += 2.5;
-    if (size === 'large') baseVal += 5.0;
+    if (size === 'medium') baseVal += 200;
+    if (size === 'large') baseVal += 400;
 
     return parseFloat(baseVal.toFixed(2));
   };
@@ -308,8 +308,8 @@ export const PizzaBuilder = () => {
                   <div className="grid grid-cols-3 gap-3">
                     {[
                       { value: 'small', label: 'Small', details: '9 inch' },
-                      { value: 'medium', label: 'Medium', details: '12 inch (+ $2.50)' },
-                      { value: 'large', label: 'Large', details: '14 inch (+ $5.00)' },
+                      { value: 'medium', label: 'Medium', details: '12 inch (+ ₹200.00)' },
+                      { value: 'large', label: 'Large', details: '14 inch (+ ₹400.00)' },
                     ].map((sz) => (
                       <motion.button
                         key={sz.value}

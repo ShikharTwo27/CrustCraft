@@ -39,23 +39,23 @@ const seedData = async () => {
 
     // 2. Map inventory items to Pizza Builder options
     const optionData = [
-      { name: 'Thin Crust', type: 'base', description: 'Light and crispy traditional crust', price: 2.00 },
-      { name: 'Thick Crust', type: 'base', description: 'Fluffy and doughy deep dish crust', price: 2.50 },
-      { name: 'Gluten-Free Crust', type: 'base', description: 'Gluten-free crispy alternative crust', price: 4.00 },
+      { name: 'Thin Crust', type: 'base', description: 'Light and crispy traditional crust', price: 160.00 },
+      { name: 'Thick Crust', type: 'base', description: 'Fluffy and doughy deep dish crust', price: 200.00 },
+      { name: 'Gluten-Free Crust', type: 'base', description: 'Gluten-free crispy alternative crust', price: 320.00 },
 
-      { name: 'Classic Marinara', type: 'sauce', description: 'Rich tomato sauce with herbs', price: 0.50 },
-      { name: 'Creamy Alfredo', type: 'sauce', description: 'Buttery garlic parmesan sauce', price: 1.00 },
-      { name: 'Spicy Barbecue', type: 'sauce', description: 'Sweet and smoky BBQ base', price: 1.20 },
+      { name: 'Classic Marinara', type: 'sauce', description: 'Rich tomato sauce with herbs', price: 40.00 },
+      { name: 'Creamy Alfredo', type: 'sauce', description: 'Buttery garlic parmesan sauce', price: 80.00 },
+      { name: 'Spicy Barbecue', type: 'sauce', description: 'Sweet and smoky BBQ base', price: 96.00 },
 
-      { name: 'Mozzarella', type: 'cheese', description: 'Mild, melt-in-your-mouth mozzarella', price: 1.50 },
-      { name: 'Cheddar', type: 'cheese', description: 'Sharp and tangy cheddar cheese', price: 1.80 },
-      { name: 'Vegan Cheese', type: 'cheese', description: 'Daiya dairy-free alternative', price: 2.50 },
+      { name: 'Mozzarella', type: 'cheese', description: 'Mild, melt-in-your-mouth mozzarella', price: 120.00 },
+      { name: 'Cheddar', type: 'cheese', description: 'Sharp and tangy cheddar cheese', price: 144.00 },
+      { name: 'Vegan Cheese', type: 'cheese', description: 'Daiya dairy-free alternative', price: 200.00 },
 
-      { name: 'Fresh Mushrooms', type: 'veggies', description: 'Slices of earthy white button mushrooms', price: 0.80 },
-      { name: 'Black Olives', type: 'veggies', description: 'Sliced cured kalamata olives', price: 0.60 },
-      { name: 'Red Onions', type: 'veggies', description: 'Finely sliced sweet red onions', price: 0.50 },
-      { name: 'Bell Peppers', type: 'veggies', description: 'Fresh green bell peppers crunchy slices', price: 0.70 },
-      { name: 'Pickled Jalapenos', type: 'veggies', description: 'Hot pickled pepper rings', price: 0.90 }
+      { name: 'Fresh Mushrooms', type: 'veggies', description: 'Slices of earthy white button mushrooms', price: 64.00 },
+      { name: 'Black Olives', type: 'veggies', description: 'Sliced cured kalamata olives', price: 48.00 },
+      { name: 'Red Onions', type: 'veggies', description: 'Finely sliced sweet red onions', price: 40.00 },
+      { name: 'Bell Peppers', type: 'veggies', description: 'Fresh green bell peppers crunchy slices', price: 56.00 },
+      { name: 'Pickled Jalapenos', type: 'veggies', description: 'Hot pickled pepper rings', price: 72.00 }
     ];
 
     // Connect each option to its inventory item object id

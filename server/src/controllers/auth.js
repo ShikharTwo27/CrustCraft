@@ -59,6 +59,7 @@ const login = async (req, res, next) => {
       message: 'Login successful.',
       data: {
         accessToken,
+        refreshToken,
         user: {
           id: user._id,
           name: user.name,
@@ -75,7 +76,7 @@ const login = async (req, res, next) => {
 
 const refresh = async (req, res, next) => {
   try {
-    const token = req.cookies?.[COOKIE_NAME] || req.body.refreshToken;
+    const token = req.body.refreshToken || req.cookies?.[COOKIE_NAME];
     if (!token) {
       res.status(401).json({ success: false, error: 'Refresh token not found.' });
       return;
@@ -88,7 +89,7 @@ const refresh = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      data: { accessToken },
+      data: { accessToken, refreshToken: newRefreshToken },
     });
   } catch (error) {
     next(error);
@@ -125,7 +126,7 @@ const reset = async (req, res, next) => {
 
 const logout = async (req, res, next) => {
   try {
-    const token = req.cookies?.[COOKIE_NAME] || req.body.refreshToken;
+    const token = req.body.refreshToken || req.cookies?.[COOKIE_NAME];
     if (token) {
       await authService.logoutUser(token);
     }

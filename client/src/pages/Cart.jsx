@@ -20,9 +20,9 @@ export const Cart = () => {
 
   // Hardcoded upsell side items
   const UPSELL_ITEMS = [
-    { id: 'garlic_bread', name: 'Garlic Breadsticks', price: 4.99, image: '🥖', desc: 'Freshly baked garlic butter rods' },
-    { id: 'lava_cake', name: 'Choco Lava Cake', price: 3.99, image: '🧁', desc: 'Warm chocolate fudge center' },
-    { id: 'coke', name: 'Mexican Coca-Cola', price: 2.25, image: '🥤', desc: 'Real cane sugar classic soda' },
+    { id: 'garlic_bread', name: 'Garlic Breadsticks', price: 399, image: '🥖', desc: 'Freshly baked garlic butter rods' },
+    { id: 'lava_cake', name: 'Choco Lava Cake', price: 319, image: '🧁', desc: 'Warm chocolate fudge center' },
+    { id: 'coke', name: 'Mexican Coca-Cola', price: 180, image: '🥤', desc: 'Real cane sugar classic soda' },
   ];
 
   useEffect(() => {
@@ -102,6 +102,75 @@ export const Cart = () => {
     }
   };
 
+  const handleDevBypassCheckout = async (e) => {
+    e.preventDefault();
+    setLocalValidationError('');
+
+    if (items.length === 0) {
+      setLocalValidationError('Your shopping cart is empty.');
+      return;
+    }
+
+    if (!address.trim() || address.length < 5) {
+      setLocalValidationError('Please enter a valid delivery address (min 5 chars).');
+      return;
+    }
+
+    if (!phone.trim() || phone.length < 10) {
+      setLocalValidationError('Please enter a valid contact phone number (min 10 chars).');
+      return;
+    }
+
+    setPaying(true);
+    try {
+      const payload = {
+        items: items.map((item) => {
+          if (item.isSide) {
+            return {
+              isSide: true,
+              sideId: item.sideId,
+              quantity: item.quantity,
+            };
+          }
+          return {
+            base: item.base._id,
+            customName: `${item.size} Customized Pizza`,
+            sauce: item.sauce._id,
+            cheese: item.cheese._id,
+            veggies: item.veggies.map((v) => v._id),
+            size: item.size,
+            quantity: item.quantity,
+          };
+        }),
+        deliveryAddress: address,
+        contactNumber: phone,
+      };
+
+      const resultAction = await dispatch(placeOrder(payload));
+      if (placeOrder.fulfilled.match(resultAction)) {
+        const order = resultAction.payload;
+        // Direct verification check with mock order bypass prefix
+        const payConfirm = await dispatch(
+          verifyPayment({
+            orderId: order._id,
+            razorpayOrderId: `mock_rzp_order_${order._id}`,
+            razorpayPaymentId: 'pay_mock_development',
+            razorpaySignature: 'mock_signature',
+          })
+        );
+        if (verifyPayment.fulfilled.match(payConfirm)) {
+          // Success handled in slice
+        } else {
+          setLocalValidationError(payConfirm.payload || 'Bypass payment confirmation failed.');
+        }
+      }
+    } catch (err) {
+      setLocalValidationError('Bypass checkout process failed.');
+    } finally {
+      setPaying(false);
+    }
+  };
+
   const handleCheckout = async (e) => {
     e.preventDefault();
     setLocalValidationError('');
@@ -122,15 +191,24 @@ export const Cart = () => {
     }
 
     const payload = {
-      items: items.map((item) => ({
-        base: item.base._id,
-        customName: `${item.size} Customized Pizza`,
-        sauce: item.sauce._id,
-        cheese: item.cheese._id,
-        veggies: item.veggies.map((v) => v._id),
-        size: item.size,
-        quantity: item.quantity,
-      })),
+      items: items.map((item) => {
+        if (item.isSide) {
+          return {
+            isSide: true,
+            sideId: item.sideId,
+            quantity: item.quantity,
+          };
+        }
+        return {
+          base: item.base._id,
+          customName: `${item.size} Customized Pizza`,
+          sauce: item.sauce._id,
+          cheese: item.cheese._id,
+          veggies: item.veggies.map((v) => v._id),
+          size: item.size,
+          quantity: item.quantity,
+        };
+      }),
       deliveryAddress: address,
       contactNumber: phone,
     };
@@ -151,7 +229,7 @@ export const Cart = () => {
           </div>
           <h1 className="text-3xl font-extrabold text-stone-900">Order Placed!</h1>
           <p className="text-stone-600 font-medium">
-            Your inventory reservation of ${lastCreatedOrder.totalAmount.toFixed(2)} is locked.
+            Your inventory reservation of ₹{lastCreatedOrder.totalAmount.toFixed(2)} is locked.
           </p>
           <div className="bg-stone-50 p-4 rounded-xl text-left border border-stone-200 text-sm space-y-2">
             <div className="flex justify-between">
@@ -227,16 +305,22 @@ export const Cart = () => {
                     exit={{ opacity: 0, height: 0, y: 20 }}
                     className="bg-white rounded-2xl border border-stone-200 shadow-sm flex flex-col sm:flex-row overflow-hidden relative"
                   >
-                    {/* Visual Pizza SVG Thumbnail */}
+                    {/* Visual Pizza SVG Thumbnail or Side emoji */}
                     <div className="bg-stone-50/50 w-full sm:w-36 h-36 flex items-center justify-center p-2 shrink-0 border-r border-stone-100">
                       <div className="w-24 h-24 scale-75 sm:scale-90 flex items-center justify-center">
-                        <PizzaCanvas
-                          size="small"
-                          base={item.base}
-                          sauce={item.sauce}
-                          cheese={item.cheese}
-                          veggies={item.veggies}
-                        />
+                        {item.isSide ? (
+                          <span className="text-5xl">
+                            {item.sideId === 'garlic_bread' ? '🥖' : item.sideId === 'lava_cake' ? '🧁' : '🥤'}
+                          </span>
+                        ) : (
+                          <PizzaCanvas
+                            size="small"
+                            base={item.base}
+                            sauce={item.sauce}
+                            cheese={item.cheese}
+                            veggies={item.veggies}
+                          />
+                        )}
                       </div>
                     </div>
 
@@ -246,19 +330,27 @@ export const Cart = () => {
                         <div>
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="text-base font-extrabold capitalize text-stone-900">
-                              {item.size} Custom Pizza
+                              {item.isSide ? item.sideName : `${item.size} Custom Pizza`}
                             </span>
-                            <span className="bg-orange-50 text-[#e23e20] text-[9px] font-black px-2 py-0.5 rounded capitalize">
-                              {item.base?.name || 'Regular Crust'}
-                            </span>
-                          </div>
-                          <ul className="text-[10px] text-stone-500 space-y-0.5 list-disc pl-4 capitalize mt-2">
-                            <li>Sauce: {item.sauce?.name || 'Classic'}</li>
-                            <li>Cheese: {item.cheese?.name || 'Mozzarella'}</li>
-                            {parseFloat((item.veggies || []).length) > 0 && (
-                              <li>Toppings: {(item.veggies || []).map((v) => v?.name || '').join(', ')}</li>
+                            {!item.isSide && (
+                              <span className="bg-orange-50 text-[#e23e20] text-[9px] font-black px-2 py-0.5 rounded capitalize">
+                                {item.base?.name || 'Regular Crust'}
+                              </span>
                             )}
-                          </ul>
+                          </div>
+                          {item.isSide ? (
+                            <p className="text-[11px] text-stone-500 mt-2 font-semibold">
+                              Freshly prepared side addition.
+                            </p>
+                          ) : (
+                            <ul className="text-[10px] text-stone-500 space-y-0.5 list-disc pl-4 capitalize mt-2">
+                              <li>Sauce: {item.sauce?.name || 'Classic'}</li>
+                              <li>Cheese: {item.cheese?.name || 'Mozzarella'}</li>
+                              {parseFloat((item.veggies || []).length) > 0 && (
+                                <li>Toppings: {(item.veggies || []).map((v) => v?.name || '').join(', ')}</li>
+                              )}
+                            </ul>
+                          )}
                         </div>
 
                         {/* Trash Action */}
@@ -273,7 +365,7 @@ export const Cart = () => {
 
                       <div className="flex justify-between items-center mt-4 pt-2 border-t border-dashed border-stone-100">
                         <span className="text-sm font-black text-[#e23e20]">
-                          ${item.price.toFixed(2)} each
+                          ₹{item.price.toFixed(2)} each
                         </span>
 
                         {/* Quantity Stepper */}
@@ -327,11 +419,11 @@ export const Cart = () => {
                     <div className="flex-grow sm:flex-grow-0">
                       <h5 className="text-xs font-black text-stone-850">{item.name}</h5>
                       <span className="text-[10px] text-stone-400 block mt-0.5">{item.desc}</span>
-                      <span className="text-xs font-black text-[#e23e20] block mt-1">${item.price}</span>
+                      <span className="text-xs font-black text-[#e23e20] block mt-1">₹{item.price}</span>
                     </div>
                     <button
                       type="button"
-                      onClick={() => alert(`To order ${item.name}, select options inside our catalog sidebars!`)}
+                      onClick={() => dispatch(addToCart({ isSide: true, sideId: item.id, name: item.name, price: item.price, quantity: 1 }))}
                       className="p-2 bg-white hover:bg-orange-50 hover:text-[#e23e20] border border-stone-200 rounded-xl text-stone-500 transition-colors shrink-0"
                     >
                       <Plus className="h-4 w-4" />
@@ -413,7 +505,7 @@ export const Cart = () => {
               <div className="border-t border-dashed border-stone-200 pt-4 space-y-2">
                 <div className="flex justify-between text-xs font-semibold text-stone-500">
                   <span>Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>₹{subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-xs font-semibold text-stone-500">
                   <span>Delivery Charge</span>
@@ -421,7 +513,7 @@ export const Cart = () => {
                 </div>
                 <div className="flex justify-between text-sm font-black text-stone-900 border-t border-stone-100 pt-2">
                   <span>Grand Total</span>
-                  <span className="text-base text-[#e23e20]">${subtotal.toFixed(2)}</span>
+                  <span className="text-base text-[#e23e20]">₹{subtotal.toFixed(2)}</span>
                 </div>
               </div>
 
@@ -438,6 +530,15 @@ export const Cart = () => {
                 ) : (
                   <span>Place Reservation Order</span>
                 )}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleDevBypassCheckout}
+                disabled={loading || paying || items.length === 0}
+                className="w-full py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold rounded-xl border border-stone-300 transition-transform hover:-translate-y-0.5 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center text-xs mt-2"
+              >
+                <span>⚡ Dev Option: Bypass Razorpay (Simulate Paid)</span>
               </button>
             </form>
           </div>

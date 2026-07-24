@@ -18,7 +18,7 @@ export const Home = () => {
       cheese: 'mozzarella',
       veggies: ['paneer', 'onion', 'jalapeno'],
       description: 'Golden grilled paneer chunks paired with spicy jalapenos on smoky BBQ sauce.',
-      price: '$12.99',
+      price: '₹1,039',
     },
     {
       name: 'Garden Veggie Delight',
@@ -28,7 +28,7 @@ export const Home = () => {
       cheese: 'mozzarella',
       veggies: ['onion', 'mushroom', 'green pepper'],
       description: 'Crispy thin crust topped with fresh mushrooms, green capsicum, and sliced onions.',
-      price: '$11.50',
+      price: '₹920',
     },
     {
       name: 'Classic Pepperoni Feast',
@@ -38,7 +38,7 @@ export const Home = () => {
       cheese: 'mozzarella',
       veggies: ['pepperoni', 'basil'],
       description: 'Original recipe loaded with premium cured pepperoni disks and fresh basil leaves.',
-      price: '$13.20',
+      price: '₹1,056',
     },
     {
       name: 'Sweet BBQ Crunch',
@@ -48,12 +48,12 @@ export const Home = () => {
       cheese: 'mozzarella',
       veggies: ['sweet corn', 'jalapeno', 'onion'],
       description: 'Sweet corn kernels contrasted with fiery green jalapeno slices and BBQ sauce.',
-      price: '$11.80',
+      price: '₹944',
     },
   ];
 
   const handleSelectCombo = (combo) => {
-    localStorage.setItem('pizzaPreset', JSON.stringify(combo));
+    sessionStorage.setItem('pizzaPreset', JSON.stringify(combo));
     navigate('/builder');
   };
 

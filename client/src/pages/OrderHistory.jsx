@@ -220,41 +220,51 @@ export const OrderHistory = () => {
                     {order.items.map((item, idx) => (
                       <div key={idx} className={`flex justify-between gap-4 ${idx > 0 ? 'pt-4' : ''}`}>
                         <div className="flex gap-4">
-                          {/* Mini Pizza Canvas thumbnail preview */}
+                          {/* Mini Pizza Canvas thumbnail preview or Side emoji */}
                           <div className="w-16 h-16 shrink-0 bg-stone-50 rounded-xl overflow-hidden flex items-center justify-center p-1 border border-stone-100">
-                            <div className="w-12 h-12 scale-60 flex items-center justify-center">
-                              <PizzaCanvas
-                                size="small"
-                                base={item.base}
-                                sauce={item.sauce}
-                                cheese={item.cheese}
-                                veggies={item.veggies}
-                              />
-                            </div>
+                            {item.isSide ? (
+                              <span className="text-2xl">
+                                {item.sideName?.includes('Bread') ? '🥖' : item.sideName?.includes('Cake') ? '🧁' : '🥤'}
+                              </span>
+                            ) : (
+                              <div className="w-12 h-12 scale-60 flex items-center justify-center">
+                                <PizzaCanvas
+                                  size="small"
+                                  base={item.base}
+                                  sauce={item.sauce}
+                                  cheese={item.cheese}
+                                  veggies={item.veggies}
+                                />
+                              </div>
+                            )}
                           </div>
 
                           <div className="space-y-1">
                             <div className="flex items-center gap-2">
                               <h4 className="font-extrabold text-stone-850 capitalize text-sm">
-                                {item.size} Custom Pizza
+                                {item.isSide ? item.sideName : `${item.size} Custom Pizza`}
                               </h4>
                               <span className="text-stone-400 font-extrabold text-xs">
                                 x{item.quantity}
                               </span>
                             </div>
-                            <ul className="text-[10px] text-stone-500 flex flex-wrap gap-x-3 capitalize leading-normal mt-0.5">
-                              <li>Base: {item.base?.name || 'Thin'}</li>
-                              <li>Sauce: {item.sauce?.name || 'Classic'}</li>
-                              <li>Cheese: {item.cheese?.name || 'Mozzarella'}</li>
-                              {parseFloat((item.veggies || []).length) > 0 && (
-                                <li>Toppings: {(item.veggies || []).map((v) => v?.name || '').join(', ')}</li>
-                              )}
-                            </ul>
+                            {!item.isSide ? (
+                              <ul className="text-[10px] text-stone-500 flex flex-wrap gap-x-3 capitalize leading-normal mt-0.5">
+                                <li>Base: {item.base?.name || 'Thin'}</li>
+                                <li>Sauce: {item.sauce?.name || 'Classic'}</li>
+                                <li>Cheese: {item.cheese?.name || 'Mozzarella'}</li>
+                                {parseFloat((item.veggies || []).length) > 0 && (
+                                  <li>Toppings: {(item.veggies || []).map((v) => v?.name || '').join(', ')}</li>
+                                )}
+                              </ul>
+                            ) : (
+                              <p className="text-[10px] text-stone-450 font-semibold">Side meal addition</p>
+                            )}
                           </div>
                         </div>
 
                         <span className="font-extrabold text-stone-700 text-sm shrink-0">
-                          ${(item.price * item.quantity).toFixed(2)}
+                          ₹{(item.price * item.quantity).toFixed(2)}
                         </span>
                       </div>
                     ))}
@@ -264,7 +274,7 @@ export const OrderHistory = () => {
                   <div className="md:col-span-4 bg-stone-50/50 p-5 rounded-2xl border border-stone-150 space-y-4 text-xs text-stone-700">
                     <div className="flex justify-between items-baseline">
                       <span className="font-bold text-stone-450 uppercase">Total Amount</span>
-                      <span className="text-lg font-black text-[#e23e20]">${order.totalAmount.toFixed(2)}</span>
+                      <span className="text-lg font-black text-[#e23e20]">₹{order.totalAmount.toFixed(2)}</span>
                     </div>
 
                     <hr className="border-stone-200" />

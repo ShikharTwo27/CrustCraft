@@ -63,6 +63,7 @@ const KanbanColumn = ({ id, title, count, children }) => {
 // Draggable Card Component
 const KanbanCard = ({ id, order }) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id });
+  const dispatch = useAppDispatch();
 
   const style = transform
     ? {
@@ -75,6 +76,33 @@ const KanbanCard = ({ id, order }) => {
     const d = new Date(dateStr);
     return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
+
+  const getActionButton = () => {
+    if (order.status === 'received') {
+      return {
+        label: 'Start Preparing',
+        nextStatus: 'in the kitchen',
+        colorClass: 'bg-orange-500 hover:bg-orange-655',
+      };
+    }
+    if (order.status === 'in the kitchen') {
+      return {
+        label: 'Dispatch Delivery',
+        nextStatus: 'out for delivery',
+        colorClass: 'bg-indigo-500 hover:bg-indigo-655',
+      };
+    }
+    if (order.status === 'out for delivery') {
+      return {
+        label: 'Mark as Delivered',
+        nextStatus: 'delivered',
+        colorClass: 'bg-emerald-500 hover:bg-emerald-655',
+      };
+    }
+    return null;
+  };
+
+  const action = getActionButton();
 
   return (
     <div
@@ -95,7 +123,7 @@ const KanbanCard = ({ id, order }) => {
 
       <div className="space-y-1">
         <h4 className="font-black text-xs text-stone-850 line-clamp-2 leading-snug">
-          {order.items.map((item) => `${item.quantity}x ${item.size} ${item.base?.name || 'Pizza'}`).join(', ')}
+          {order.items.map((item) => item.isSide ? `${item.quantity}x ${item.sideName}` : `${item.quantity}x ${item.size} ${item.base?.name || 'Pizza'}`).join(', ')}
         </h4>
         <span className="text-[10px] text-stone-400 block max-w-full truncate capitalize">
           To: {order.deliveryAddress}
@@ -110,8 +138,23 @@ const KanbanCard = ({ id, order }) => {
         >
           {order.paymentStatus}
         </span>
-        <span className="font-black text-stone-850">${order.totalAmount.toFixed(2)}</span>
+        <span className="font-black text-stone-850">₹{order.totalAmount.toFixed(2)}</span>
       </div>
+
+      {action && (
+        <button
+          type="button"
+          onPointerDown={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            dispatch(updateAdminOrderStatus({ id: order._id, status: action.nextStatus }));
+          }}
+          className={`w-full py-1.5 text-white text-[9px] font-black rounded-lg transition-all text-center block uppercase tracking-wider hover:scale-[1.02] shadow-sm ${action.colorClass}`}
+        >
+          {action.label}
+        </button>
+      )}
     </div>
   );
 };
@@ -216,7 +259,7 @@ export const AdminOrders = () => {
           <div>
             <span className="text-[10px] text-stone-400 font-black uppercase tracking-wider block">Today's Revenue</span>
             <div className="text-3xl font-black text-stone-900 mt-1">
-              ${orders.reduce((sum, o) => sum + o.totalAmount, 0).toFixed(2)}
+              ₹{orders.reduce((sum, o) => sum + o.totalAmount, 0).toFixed(2)}
             </div>
           </div>
           <Sparkline points={revenueTrends} color="#10b981" />
@@ -273,12 +316,12 @@ export const AdminOrders = () => {
                   #{order._id.substring(order._id.length - 8)}
                 </span>
                 <span className="text-stone-500 ml-3 capitalize font-semibold">
-                  {order.items.map((item) => `${item.quantity}x ${item.size} ${item.base?.name || 'Pizza'}`).join(', ')}
+                  {order.items.map((item) => item.isSide ? `${item.quantity}x ${item.sideName}` : `${item.quantity}x ${item.size} ${item.base?.name || 'Pizza'}`).join(', ')}
                 </span>
               </div>
               <div className="flex items-center gap-4">
                 <span className="text-stone-400">{new Date(order.createdAt).toLocaleDateString()}</span>
-                <span className="font-black text-stone-800">${order.totalAmount.toFixed(2)}</span>
+                <span className="font-black text-stone-800">₹{order.totalAmount.toFixed(2)}</span>
               </div>
             </div>
           ))}

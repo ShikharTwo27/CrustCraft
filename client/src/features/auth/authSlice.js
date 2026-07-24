@@ -9,6 +9,13 @@ const initialState = {
   initialized: false,
 };
 
+const getErrorMessage = (error, defaultMsg) => {
+  if (error.response?.data?.details && Array.isArray(error.response.data.details)) {
+    return error.response.data.details.map((d) => d.message).join(', ');
+  }
+  return error.response?.data?.error || error.response?.data?.message || defaultMsg;
+};
+
 // Thunks
 export const registerUser = createAsyncThunk(
   'auth/register',
@@ -17,9 +24,7 @@ export const registerUser = createAsyncThunk(
       const response = await api.post('/auth/register', data);
       return response.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.error || error.response?.data?.message || 'Registration failed'
-      );
+      return rejectWithValue(getErrorMessage(error, 'Registration failed'));
     }
   }
 );
@@ -29,13 +34,12 @@ export const loginUser = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     try {
       const response = await api.post('/auth/login', data);
-      const { accessToken, user } = response.data.data;
-      localStorage.setItem('accessToken', accessToken);
+      const { accessToken, refreshToken, user } = response.data.data;
+      sessionStorage.setItem('accessToken', accessToken);
+      sessionStorage.setItem('refreshToken', refreshToken);
       return user;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.error || error.response?.data?.message || 'Login failed'
-      );
+      return rejectWithValue(getErrorMessage(error, 'Login failed'));
     }
   }
 );
@@ -44,11 +48,13 @@ export const logoutUser = createAsyncThunk(
   'auth/logout',
   async (_, { rejectWithValue }) => {
     try {
-      await api.post('/auth/logout');
+      const refreshToken = sessionStorage.getItem('refreshToken');
+      await api.post('/auth/logout', { refreshToken });
     } catch (error) {
       // Proceed with local logout even if request fails
     } finally {
-      localStorage.removeItem('accessToken');
+      sessionStorage.removeItem('accessToken');
+      sessionStorage.removeItem('refreshToken');
     }
   }
 );
@@ -57,13 +63,14 @@ export const checkMe = createAsyncThunk(
   'auth/checkMe',
   async (_, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem('accessToken');
+      const token = sessionStorage.getItem('accessToken');
       if (!token) throw new Error('No access token in storage');
       
       const response = await api.get('/auth/me');
       return response.data.data.user;
     } catch (error) {
-      localStorage.removeItem('accessToken');
+      sessionStorage.removeItem('accessToken');
+      sessionStorage.removeItem('refreshToken');
       return rejectWithValue(
         error.response?.data?.error || 'Session check failed'
       );
@@ -78,9 +85,7 @@ export const verifyEmail = createAsyncThunk(
       const response = await api.post('/auth/verify-email', { token });
       return response.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.error || error.response?.data?.message || 'Verification failed'
-      );
+      return rejectWithValue(getErrorMessage(error, 'Verification failed'));
     }
   }
 );
@@ -92,9 +97,7 @@ export const forgotPassword = createAsyncThunk(
       const response = await api.post('/auth/forgot-password', { email });
       return response.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.error || error.response?.data?.message || 'Failed to send request'
-      );
+      return rejectWithValue(getErrorMessage(error, 'Failed to send request'));
     }
   }
 );
@@ -106,9 +109,7 @@ export const resetPassword = createAsyncThunk(
       const response = await api.post('/auth/reset-password', data);
       return response.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.error || error.response?.data?.message || 'Reset failed'
-      );
+      return rejectWithValue(getErrorMessage(error, 'Reset failed'));
     }
   }
 );

@@ -3,20 +3,20 @@ import api from '../../utils/api';
 
 const loadSavedItems = () => {
   try {
-    const saved = localStorage.getItem('cartItems');
+    const saved = sessionStorage.getItem('cartItems');
     if (!saved) return [];
     const parsed = JSON.parse(saved);
     if (!Array.isArray(parsed)) return [];
-    // Only load items that are fully structured pizza builds
-    return parsed.filter(item => item && item.base && item.sauce && item.cheese);
+    // Only load items that are fully structured pizza builds or side items
+    return parsed.filter(item => item && (item.isSide || (item.base && item.sauce && item.cheese)));
   } catch (err) {
     console.warn('Failed to parse saved cart items:', err);
     return [];
   }
 };
 
-const savedAddress = localStorage.getItem('deliveryAddress');
-const savedPhone = localStorage.getItem('contactNumber');
+const savedAddress = sessionStorage.getItem('deliveryAddress');
+const savedPhone = sessionStorage.getItem('contactNumber');
 
 const initialState = {
   items: loadSavedItems(),
@@ -62,6 +62,26 @@ const cartSlice = createSlice({
   initialState,
   reducers: {
     addToCart: (state, action) => {
+      if (action.payload.isSide) {
+        const { sideId, name, price, quantity } = action.payload;
+        const hash = `side-${sideId}`;
+        const existingIndex = state.items.findIndex((item) => item.hash === hash);
+        if (existingIndex > -1) {
+          state.items[existingIndex].quantity += quantity;
+        } else {
+          state.items.push({
+            hash,
+            isSide: true,
+            sideId,
+            sideName: name,
+            price,
+            quantity,
+          });
+        }
+        sessionStorage.setItem('cartItems', JSON.stringify(state.items));
+        return;
+      }
+
       const { base, sauce, cheese, veggies, size, quantity, price } = action.payload;
 
       // Create a unique hash signature for the custom pizza configuration
@@ -83,11 +103,11 @@ const cartSlice = createSlice({
           price,
         });
       }
-      localStorage.setItem('cartItems', JSON.stringify(state.items));
+      sessionStorage.setItem('cartItems', JSON.stringify(state.items));
     },
     removeFromCart: (state, action) => {
       state.items = state.items.filter((item) => item.hash !== action.payload);
-      localStorage.setItem('cartItems', JSON.stringify(state.items));
+      sessionStorage.setItem('cartItems', JSON.stringify(state.items));
     },
     updateQuantity: (state, action) => {
       const { hash, quantity } = action.payload;
@@ -95,13 +115,13 @@ const cartSlice = createSlice({
       if (index > -1) {
         state.items[index].quantity = Math.max(1, quantity);
       }
-      localStorage.setItem('cartItems', JSON.stringify(state.items));
+      sessionStorage.setItem('cartItems', JSON.stringify(state.items));
     },
     clearCart: (state) => {
       state.items = [];
       state.success = false;
       state.error = null;
-      localStorage.removeItem('cartItems');
+      sessionStorage.removeItem('cartItems');
     },
     resetSuccess: (state) => {
       state.success = false;
@@ -111,8 +131,8 @@ const cartSlice = createSlice({
     setContactInfo: (state, action) => {
       state.deliveryAddress = action.payload.deliveryAddress;
       state.contactNumber = action.payload.contactNumber;
-      localStorage.setItem('deliveryAddress', action.payload.deliveryAddress);
-      localStorage.setItem('contactNumber', action.payload.contactNumber);
+      sessionStorage.setItem('deliveryAddress', action.payload.deliveryAddress);
+      sessionStorage.setItem('contactNumber', action.payload.contactNumber);
     },
   },
   extraReducers: (builder) => {

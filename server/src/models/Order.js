@@ -1,13 +1,15 @@
 const { Schema, model } = require('mongoose');
 
 const customPizzaItemSchema = new Schema({
-  base: { type: Schema.Types.ObjectId, ref: 'PizzaOption', required: true },
-  sauce: { type: Schema.Types.ObjectId, ref: 'PizzaOption', required: true },
-  cheese: { type: Schema.Types.ObjectId, ref: 'PizzaOption', required: true },
+  base: { type: Schema.Types.ObjectId, ref: 'PizzaOption', required: false },
+  sauce: { type: Schema.Types.ObjectId, ref: 'PizzaOption', required: false },
+  cheese: { type: Schema.Types.ObjectId, ref: 'PizzaOption', required: false },
   veggies: [{ type: Schema.Types.ObjectId, ref: 'PizzaOption' }],
-  size: { type: String, enum: ['small', 'medium', 'large'], required: true },
+  size: { type: String, enum: ['small', 'medium', 'large'], required: false },
   quantity: { type: Number, required: true, min: 1, default: 1 },
   price: { type: Number, required: true },
+  isSide: { type: Boolean, default: false },
+  sideName: { type: String },
 });
 
 const orderSchema = new Schema(
