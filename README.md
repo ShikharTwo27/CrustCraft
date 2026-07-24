@@ -6,17 +6,17 @@ The platform supports atomic reservation transactions, secure payment verificati
 
 ---
 
-## 🚀 Key Unique Selling Points (USPs)
+## Key Unique Selling Points (USPs)
 
 *   **Inventory-Aware Customizer Canvas**: Layer-by-layer canvas studio. Built using SVG assets and Framer Motion spring physics. Ingredients are linked dynamically to live stock counts.
 *   **Atomic Stock Deductions**: Built-in race-condition protection. Order placement and payment verification execute inside an atomic Mongoose database session, locking ingredient inventory dynamically to prevent double-booking.
 *   **Simulated Road-Delivery Telemetry**: Traces route geometry dynamically between storefront coordinates and customer destinations using the public OSRM Routing API. When an order goes out for delivery, the server initiates an interpolation sequence, broadcasting driver coordinates in real time via Socket.io to an interactive Leaflet tracking map.
 *   **Tab-Isolated Multi-Session Auth**: Session tokens, active carts, and customization presets are bound to browser `sessionStorage`. This isolates sessions by tab, allowing recruiters to test customer checkout flows and admin Kanban status changes concurrently in separate tabs of the same browser window.
-*   **Real-Time Status Notifications**: Sliding toast notifications alert active customer sessions of order transitions (Received ➡️ Kitchen ➡️ Out for Delivery ➡️ Delivered) as they occur.
+*   **Real-Time Status Notifications**: Sliding toast notifications alert active customer sessions of order transitions (Received > Kitchen > Out for Delivery > Delivered) as they occur.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 *   **Frontend**: React 19, Redux Toolkit (RTK), Framer Motion, Leaflet (`react-leaflet`), Socket.io-client, Tailwind CSS, Lucide React.
 *   **Backend**: Node.js, Express, MongoDB (Mongoose), Socket.io, Zod (Request validation), Jest (Integration testing).
@@ -24,7 +24,7 @@ The platform supports atomic reservation transactions, secure payment verificati
 
 ---
 
-## 📂 Project Architecture
+## Project Architecture
 
 ```text
 CrustCraft (Monorepo)
@@ -55,7 +55,7 @@ CrustCraft (Monorepo)
 
 ---
 
-## 💻 Local Setup & Installation
+## Local Setup & Installation
 
 ### Prerequisites
 *   Node.js (v18+)
@@ -127,7 +127,7 @@ To thoroughly test the live integration:
 
 ---
 
-## 🎯 Verification and Tests
+## Verification and Tests
 Execute the integration test suite (covering checkout validations, database session locks, and registration flow limits):
 ```bash
 npm run test:server
