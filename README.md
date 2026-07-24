@@ -100,7 +100,7 @@ The client application will mount at `http://localhost:5173`.
 
 ---
 
-## 🧪 Recruiter Testing Playbook
+## Recruiter Testing Playbook
 
 To thoroughly test the live integration:
 
@@ -130,5 +130,5 @@ To thoroughly test the live integration:
 ## Verification and Tests
 Execute the integration test suite (covering checkout validations, database session locks, and registration flow limits):
 ```bash
-npm run test:server
+npm run test:server    
 ```
