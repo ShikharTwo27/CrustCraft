@@ -6,7 +6,7 @@ const COOKIE_NAME = 'refreshToken';
 const getCookieOptions = () => ({
   httpOnly: true,
   secure: env.NODE_ENV === 'production',
-  sameSite: 'lax',
+  sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax',
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 });
 
@@ -134,7 +134,7 @@ const logout = async (req, res, next) => {
     res.clearCookie(COOKIE_NAME, {
       httpOnly: true,
       secure: env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax',
     });
 
     res.status(200).json({
