@@ -435,7 +435,7 @@ export const Cart = () => {
           </div>
 
           {/* Checkout Details (Right Side) */}
-          <div className="lg:col-span-5 bg-white p-6 rounded-3xl border border-stone-200 shadow-md space-y-6 sticky top-24">
+          <div className="lg:col-span-5 bg-white p-6 rounded-3xl border border-stone-200 shadow-md space-y-6 lg:sticky lg:top-24">
             <h3 className="text-lg font-black text-stone-900 border-b border-stone-150 pb-4">
               Checkout & Delivery Address
             </h3>

@@ -265,7 +265,7 @@ export const PizzaBuilder = () => {
       {/* Main Studio Canvas Layout */}
       <div className="grid lg:grid-cols-12 gap-8 items-start">
         {/* Dynamic Visual Mockup (Left Side) */}
-        <div className="lg:col-span-5 bg-white border border-stone-200 rounded-3xl p-6 flex flex-col items-center justify-center sticky top-24 shadow-sm min-h-[400px]">
+        <div className="lg:col-span-5 bg-white border border-stone-200 rounded-3xl p-6 flex flex-col items-center justify-center lg:sticky lg:top-24 shadow-sm min-h-[300px] sm:min-h-[400px]">
           <PizzaCanvas
             size={size}
             base={selectedBase}

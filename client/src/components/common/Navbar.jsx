@@ -27,14 +27,14 @@ export const Navbar = () => {
               <div className="bg-pizza-500 p-2 rounded-xl text-white shadow-md shadow-pizza-500/20">
                 <Pizza className="h-6 w-6 animate-pulse" />
               </div>
-              <span className="text-xl font-bold tracking-tight text-stone-900">
+              <span className="text-xl font-bold tracking-tight text-stone-900 hidden sm:block">
                 Crust<span className="text-pizza-500">Craft</span>
               </span>
             </Link>
           </div>
 
           {/* Navigation Links */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-1 sm:space-x-4 overflow-x-auto max-w-[calc(100vw-85px)] sm:max-w-none scrollbar-none py-1">
             {isAuthenticated && user ? (
               <>
                 <Link
